@@ -1,11 +1,13 @@
 import java.sql.*;
 
 /**
- * InitializeDatabase
+ * DatabaseManager
  * @author florian
  * @since 2024-11-08
  */
-public class InitializeDatabase {
+public class DatabaseManager {
+	static Connection c = null;
+
 	public static void initialize(Connection c) throws SQLException {
 		Statement fahrzeugtypen = c.createStatement();
 		String fahrzeugtypenCreate = """
@@ -39,5 +41,11 @@ public class InitializeDatabase {
 			    \tON UPDATE CASCADE ON DELETE RESTRICT
 			)""";
 		transport.executeQuery(transportCreate);
+	}
+
+	public static Connection connect(String url, String username, String password) throws SQLException {
+		if (c == null)
+			c = DriverManager.getConnection(url, username, password);
+		return c;
 	}
 }
