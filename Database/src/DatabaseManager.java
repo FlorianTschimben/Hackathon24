@@ -25,7 +25,7 @@ public class DatabaseManager {
 		Statement transport = c.createStatement();
 		String transportCreate = """
 			CREATE TABLE transport(
-					tnr VARCHAR(10) PRIMARY KEY,
+					tnr VARCHAR(20) PRIMARY KEY,
 				    tdatum DATE NOT NULL,
 				    tstart TIME NOT NULL,
 				    tende TIME NOT NULL,
@@ -34,10 +34,10 @@ public class DatabaseManager {
 				    tbisort VARCHAR(100) NOT NULL,
 				    tbisstrasse VARCHAR(100) NOT NULL,
 				    tart ENUM("KANN GEHEN", "STUHL", "LIEGE", "KEIN PATIENT", "EIGENER ROLLSTUHL") NOT NULL,
-				    tbezugnr VARCHAR(10),
+				    tbezugnr VARCHAR(20),
 				    tkmtotale INT NOT NULL,
 				    fnr INT NOT NULL,
-				    tsektionsoirt VARCHAR(100),
+				    tsektionsort VARCHAR(100),
 				    FOREIGN KEY (fnr) REFERENCES fahrzeugtypen(fnr)
 			    	ON UPDATE CASCADE ON DELETE RESTRICT
 			)""";
