@@ -27,6 +27,7 @@ public class GPXViewer extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (routePoints == null || routePoints.isEmpty()) {
+            System.out.println("No route points to display.");
             return;
         }
 
@@ -35,11 +36,14 @@ public class GPXViewer extends JPanel {
         g2d.setStroke(new BasicStroke(2));
         g2d.setColor(Color.BLUE);
 
-        // Define map bounds (for simple projection mapping)
+        // Define map bounds
         double minLat = routePoints.stream().mapToDouble(p -> p.getLatitude().doubleValue()).min().orElse(0);
         double maxLat = routePoints.stream().mapToDouble(p -> p.getLatitude().doubleValue()).max().orElse(0);
         double minLon = routePoints.stream().mapToDouble(p -> p.getLongitude().doubleValue()).min().orElse(0);
         double maxLon = routePoints.stream().mapToDouble(p -> p.getLongitude().doubleValue()).max().orElse(0);
+
+        // Debugging output for bounds
+        System.out.println("Bounds: minLat=" + minLat + ", maxLat=" + maxLat + ", minLon=" + minLon + ", maxLon=" + maxLon);
 
         // Draw route using the points in the GPX file
         Path2D path = new Path2D.Double();
@@ -49,6 +53,9 @@ public class GPXViewer extends JPanel {
             // Convert GPS coordinates to panel coordinates
             int x = (int) ((point.getLongitude().doubleValue() - minLon) / (maxLon - minLon) * getWidth());
             int y = (int) ((maxLat - point.getLatitude().doubleValue()) / (maxLat - minLat) * getHeight());
+
+            // Debugging output for each point's coordinates
+            System.out.println("Point " + i + ": GPS (" + point.getLatitude() + ", " + point.getLongitude() + ") -> Pixel (" + x + ", " + y + ")");
 
             if (i == 0) {
                 path.moveTo(x, y);
@@ -60,12 +67,13 @@ public class GPXViewer extends JPanel {
         g2d.draw(path);
     }
 
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("GPX Route Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
-        GPXViewer viewer = new GPXViewer("path/to/your/file.gpx");
+        GPXViewer viewer = new GPXViewer("UI/gpxgenerator_path.gpx");
         frame.add(viewer);
 
         frame.setVisible(true);

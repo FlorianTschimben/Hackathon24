@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/AddressToGeodataConverter/AddressToGeodataConverter.iml" filepath="$PROJECT_DIR$/AddressToGeodataConverter/AddressToGeodataConverter.iml" />
       <module fileurl="file://$PROJECT_DIR$/Database/Database.iml" filepath="$PROJECT_DIR$/Database/Database.iml" />
       <module fileurl="file://$PROJECT_DIR$/RoutePlanning/RoutePlanning.iml" filepath="$PROJECT_DIR$/RoutePlanning/RoutePlanning.iml" />
+      <module fileurl="file://$PROJECT_DIR$/UI/UI.iml" filepath="$PROJECT_DIR$/UI/UI.iml" />
     </modules>
   </component>
 </project>
