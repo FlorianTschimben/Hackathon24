@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AddressToGeodataConverter/AddressToGeodataConverter.iml" filepath="$PROJECT_DIR$/AddressToGeodataConverter/AddressToGeodataConverter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RoutePlanning/Database/Database.iml" filepath="$PROJECT_DIR$/RoutePlanning/Database/Database.iml" />
       <module fileurl="file://$PROJECT_DIR$/RoutePlanning/RoutePlanning.iml" filepath="$PROJECT_DIR$/RoutePlanning/RoutePlanning.iml" />
     </modules>
   </component>
