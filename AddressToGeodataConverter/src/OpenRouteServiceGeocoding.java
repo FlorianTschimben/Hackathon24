@@ -9,7 +9,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-public class OpenRouteServiceGeocodingHttpURLConnection {
+public class OpenRouteServiceGeocoding {
 
     private static final String API_KEY = "5b3ce3597851110001cf6248a19910ccc5174a4d8ddf7e5be1f675d4";  // Replace with your ORS API key
     private static final String GEOCODING_URL = "https://api.openrouteservice.org/geocode/search";
@@ -19,7 +19,7 @@ public class OpenRouteServiceGeocodingHttpURLConnection {
         try {
             String coordinates = geocodeAddress(address);
             if (coordinates != null) {
-                System.out.println("Coordinates for '" + address + "': " + coordinates);
+                System.out.println("Coordinates for '" + address + "': " + coordinates.toString());
             } else {
                 System.out.println("No coordinates found for the address.");
             }
@@ -28,6 +28,12 @@ public class OpenRouteServiceGeocodingHttpURLConnection {
         }
     }
 
+    /**
+     *
+     * @param address
+     * @return String longitude:latitude
+     * @throws IOException
+     */
     public static String geocodeAddress(String address) throws IOException {
         // Encode the address to be URL-friendly
         String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
@@ -66,7 +72,8 @@ public class OpenRouteServiceGeocodingHttpURLConnection {
                 // Longitude is first, latitude is second
                 double longitude = coordinates.getDouble(0);
                 double latitude = coordinates.getDouble(1);
-                return "Latitude: " + latitude + ", Longitude: " + longitude;
+                System.out.println(longitude + ":" + latitude);
+                return longitude + ":" + latitude;
             }
         } else {
             System.out.println("Request failed with status code: " + connection.getResponseCode());

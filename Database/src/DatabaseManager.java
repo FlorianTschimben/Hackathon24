@@ -49,4 +49,8 @@ public class DatabaseManager {
 			c = DriverManager.getConnection(url, username, password);
 		return c;
 	}
+
+	public static ResultSet getEveryTransport(Connection c) throws SQLException {
+		return c.createStatement().executeQuery("SELECT * FROM transport");
+	}
 }

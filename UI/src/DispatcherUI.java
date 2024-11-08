@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class DispatcherUI extends JFrame {
 
@@ -16,65 +18,51 @@ public class DispatcherUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Create layout manager for switching panels
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Initialize each main view panel
         dashboardPanel = new JPanel(new BorderLayout());
-        mapPanel = new JPanel(); // Placeholder for map rendering, leave empty for now
+        mapPanel = new JPanel();
         patientManagementPanel = new JPanel(new BorderLayout());
         historyPanel = new JPanel(new BorderLayout());
 
-        // Add panels to main panel with unique identifiers
         mainPanel.add(dashboardPanel, "Dashboard");
         mainPanel.add(mapPanel, "Map");
         mainPanel.add(patientManagementPanel, "PatientManagement");
         mainPanel.add(historyPanel, "History");
 
-        // Initialize side menu
         JPanel sideMenu = new JPanel(new GridLayout(4, 1, 5, 5));
         JButton dashboardButton = new JButton("Dashboard");
         JButton mapButton = new JButton("Map View");
         JButton patientManagementButton = new JButton("Patient Management");
         JButton historyButton = new JButton("History");
 
-        // Add buttons to the side menu
         sideMenu.add(dashboardButton);
         sideMenu.add(mapButton);
         sideMenu.add(patientManagementButton);
         sideMenu.add(historyButton);
 
-        // Add ActionListeners for navigation buttons
         dashboardButton.addActionListener(e -> cardLayout.show(mainPanel, "Dashboard"));
         mapButton.addActionListener(e -> cardLayout.show(mainPanel, "Map"));
         patientManagementButton.addActionListener(e -> cardLayout.show(mainPanel, "PatientManagement"));
         historyButton.addActionListener(e -> cardLayout.show(mainPanel, "History"));
 
-        // Configure dashboard view
         setupDashboardPanel();
-
-        // Configure patient management view
         setupPatientManagementPanel();
-
-        // Configure history view
         setupHistoryPanel();
 
-        // Set up the frame layout
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(sideMenu, BorderLayout.WEST);
         getContentPane().add(mainPanel, BorderLayout.CENTER);
     }
 
     private void setupDashboardPanel() {
-        // Placeholder table for transport overview
-        String[] columnNames = {"Vehicle ID", "Patients", "Departure", "Arrival", "Status"};
-        Object[][] data = {}; // Empty data for now
+        String[] columnNames = {"Transport ID", "Date", "Start Time", "End Time", "From City", "From Street", "To City", "To Street", "Type", "Reference", "Total KM", "Vehicle ID", "Section"};
+        Object[][] data = fetchTransportData(); // Get data from the database
         JTable transportTable = new JTable(data, columnNames);
 
         dashboardPanel.add(new JScrollPane(transportTable), BorderLayout.CENTER);
 
-        // Top bar for quick actions
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton addTransportButton = new JButton("Add Transport");
         JButton optimizeButton = new JButton("Optimize");
@@ -85,15 +73,44 @@ public class DispatcherUI extends JFrame {
         dashboardPanel.add(topBar, BorderLayout.NORTH);
     }
 
+    private Object[][] fetchTransportData() {
+        ArrayList<Object[]> rows = new ArrayList<>();
+
+		try {
+            ResultSet rs = DatabaseManager.getEveryTransport(DatabaseManager.connect("jdbc:mysql://localhost/hackathon", "root", ""));
+
+		while (rs.next()) {
+                Object[] row = {
+                    rs.getString("tnr"),
+                    rs.getDate("tdatum"),
+                    rs.getTime("tstart"),
+                    rs.getTime("tende"),
+                    rs.getString("tvonort"),
+                    rs.getString("tvonstrasse"),
+                    rs.getString("tbisort"),
+                    rs.getString("tbisstrasse"),
+                    rs.getString("tart"),
+                    rs.getString("tbezugnr"),
+                    rs.getInt("tkmtotale"),
+                    rs.getInt("fnr"),
+                    rs.getString("tsektionsoirt")
+                };
+                rows.add(row);
+            }
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rows.toArray(new Object[0][0]);
+    }
+
     private void setupPatientManagementPanel() {
-        // Placeholder table for patient management
         String[] columnNames = {"Patient ID", "Name", "Destination", "Arrival Time"};
-        Object[][] data = {}; // Empty data for now
+        Object[][] data = {};
         JTable patientTable = new JTable(data, columnNames);
 
         patientManagementPanel.add(new JScrollPane(patientTable), BorderLayout.CENTER);
 
-        // Top bar for quick actions
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton addPatientButton = new JButton("Add Patient");
         JButton editPatientButton = new JButton("Edit Patient");
@@ -105,14 +122,12 @@ public class DispatcherUI extends JFrame {
     }
 
     private void setupHistoryPanel() {
-        // Placeholder table for history view
         String[] columnNames = {"Transport ID", "Vehicle", "Patients", "Departure", "Arrival"};
-        Object[][] data = {}; // Empty data for now
+        Object[][] data = {};
         JTable historyTable = new JTable(data, columnNames);
 
         historyPanel.add(new JScrollPane(historyTable), BorderLayout.CENTER);
 
-        // Top bar for report generation
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton generateReportButton = new JButton("Generate Report");
 

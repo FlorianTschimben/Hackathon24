@@ -1,4 +1,6 @@
 import DirectionsServicePOST.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -8,20 +10,23 @@ import java.net.http.HttpClient;
 public class Main {
     public static void main(String[] args) {
         HttpClient orsClient = HttpClient.newHttpClient();
+        try {
+            String geoCode1 = OpenRouteServiceGeocoding.geocodeAddress("Neulandstraße 7, Neumarkt,BZ,Italien");
+            String geoCode2 = OpenRouteServiceGeocoding.geocodeAddress("Sorrentstraße 20, Bozen,BZ,Italien");
 
         try {
             DirectionsServicePOSTResult output = new DirectionsServicePOSTRequest(
                     "driving-car", //driver profile
-                    36.37,    //latitude a
-                    -94.2,    //longitude a
-                    36.39,    //latitude b
-                    -94.22,   //longitude b
+                    Double.parseDouble(geoCode1.substring(geoCode1.indexOf(':') + 1)),    //latitude a
+                    Double.parseDouble(geoCode1.substring(0, geoCode1.indexOf(':') - 1)),    //longitude a
+                    Double.parseDouble(geoCode2.substring(geoCode1.indexOf(':') + 1)),    //latitude b
+                    Double.parseDouble(geoCode2.substring(0, geoCode1.indexOf(':') - 1)),   //longitude b
                     0.6,      //Maximum fraction of the route that alternatives may share with the optimal route.
                     2,        //Target number of alternative routes to compute.
                     1.4,       //Maximum factor by which route weight may diverge from the optimal route.
                     true,      //include avg speed
                     true,      //include elevation
-                    60.00, //max speed in mph
+                    200.00, //max speed in mph
                     "mi",      //distance units
                     orsClient, //HttpClient object
                     "https://api.openrouteservice.org/v2/directions/", //server endpoint address
@@ -29,11 +34,22 @@ public class Main {
             ).postDirections();
             System.out.println("Hallo welt");
             System.out.println(output.toString());
+            JSONObject jsonResponseObj = new JSONObject(output);
+            JSONArray routes = jsonResponseObj.getJSONArray("routes");
+            JSONObject firstRoute = routes.getJSONObject(0);
+            JSONObject summary = firstRoute.getJSONObject("summary");
+            double overallDuration = summary.getDouble("duration");
+
+            System.out.println("Overall Duration: " + overallDuration + " seconds");
+
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
