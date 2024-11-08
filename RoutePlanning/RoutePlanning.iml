@@ -16,6 +16,16 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../jxmapviewer2-2.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="jxmapviewer2-2.8" level="project" />
     <orderEntry type="module" module-name="AddressToGeodataConverter" />
     <orderEntry type="module-library">
       <library>
