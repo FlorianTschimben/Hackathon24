@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_d0b18eb2f07f16954c0d8f5ed8d1e5c0 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_d0b18eb2f07f16954c0d8f5ed8d1e5c0" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_d0b18eb2f07f16954c0d8f5ed8d1e5c0 = L.map(
+                "map_d0b18eb2f07f16954c0d8f5ed8d1e5c0",
+                {
+                    center: [49.414586, 8.68119],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 13,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_91325fbc2bd9a40b0f9867113e67dd76 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            );
+        
+    
+            tile_layer_91325fbc2bd9a40b0f9867113e67dd76.addTo(map_d0b18eb2f07f16954c0d8f5ed8d1e5c0);
+        
+    
+
+        function geo_json_14c76010101cfaa2f05cff290711fe6e_onEachFeature(feature, layer) {
+            layer.on({
+            });
+        };
+        var geo_json_14c76010101cfaa2f05cff290711fe6e = L.geoJson(null, {
+                onEachFeature: geo_json_14c76010101cfaa2f05cff290711fe6e_onEachFeature,
+            
+        });
+
+        function geo_json_14c76010101cfaa2f05cff290711fe6e_add (data) {
+            geo_json_14c76010101cfaa2f05cff290711fe6e
+                .addData(data);
+        }
+            geo_json_14c76010101cfaa2f05cff290711fe6e_add({"bbox": [8.680733, 49.414057, 8.690123, 49.420514], "features": [{"bbox": [8.680733, 49.414057, 8.690123, 49.420514], "geometry": {"coordinates": [[8.681424, 49.414597], [8.68119, 49.414586], [8.680733, 49.414531], [8.68085, 49.414178], [8.680894, 49.414132], [8.681237, 49.414057], [8.68147, 49.414599], [8.681488, 49.41465], [8.681423, 49.415746], [8.681656, 49.41659], [8.681826, 49.417081], [8.681881, 49.417392], [8.682461, 49.417389], [8.682676, 49.417387], [8.683595, 49.417372], [8.68536, 49.417365], [8.686407, 49.417365], [8.68703, 49.41736], [8.687467, 49.417351], [8.688212, 49.417358], [8.688802, 49.417381], [8.68871, 49.418194], [8.688647, 49.418465], [8.688539, 49.418964], [8.688398, 49.41963], [8.690123, 49.419833], [8.689854, 49.420217], [8.689653, 49.420514], [8.687871, 49.420322]], "type": "LineString"}, "properties": {"segments": [{"distance": 1592.6, "duration": 326.0, "steps": [{"distance": 50.7, "duration": 12.2, "instruction": "Head west on Gerhart-Hauptmann-Stra\u00dfe", "name": "Gerhart-Hauptmann-Stra\u00dfe", "type": 11, "way_points": [0, 2]}, {"distance": 72.3, "duration": 17.4, "instruction": "Turn left onto Wielandtstra\u00dfe", "name": "Wielandtstra\u00dfe", "type": 0, "way_points": [2, 5]}, {"distance": 376.5, "duration": 90.3, "instruction": "Turn left onto Wielandtstra\u00dfe", "name": "Wielandtstra\u00dfe", "type": 0, "way_points": [5, 11]}, {"distance": 500.8, "duration": 76.4, "instruction": "Turn right onto M\u00f6nchhofstra\u00dfe", "name": "M\u00f6nchhofstra\u00dfe", "type": 1, "way_points": [11, 20]}, {"distance": 251.9, "duration": 60.5, "instruction": "Turn left onto Erwin-Rohde-Stra\u00dfe", "name": "Erwin-Rohde-Stra\u00dfe", "type": 0, "way_points": [20, 24]}, {"distance": 126.8, "duration": 30.4, "instruction": "Turn right onto Moltkestra\u00dfe", "name": "Moltkestra\u00dfe", "type": 1, "way_points": [24, 25]}, {"distance": 83.0, "duration": 7.5, "instruction": "Turn sharp left onto Handschuhsheimer Landstra\u00dfe, B 3", "name": "Handschuhsheimer Landstra\u00dfe, B 3", "type": 2, "way_points": [25, 27]}, {"distance": 130.6, "duration": 31.4, "instruction": "Turn left onto Roonstra\u00dfe", "name": "Roonstra\u00dfe", "type": 0, "way_points": [27, 28]}, {"distance": 0.0, "duration": 0.0, "instruction": "Arrive at Roonstra\u00dfe, straight ahead", "name": "-", "type": 10, "way_points": [28, 28]}]}], "summary": {"distance": 1592.6, "duration": 326.0}, "way_points": [0, 28]}, "type": "Feature"}], "metadata": {"attribution": "openrouteservice.org | OpenStreetMap contributors", "engine": {"build_date": "2024-10-09T09:23:42Z", "graph_date": "2024-09-23T14:39:49Z", "version": "8.2.0"}, "query": {"coordinates": [[8.681423, 49.41461], [8.687872, 49.420318]], "format": "json", "profile": "driving-car"}, "service": "routing", "timestamp": 1731141409313}, "type": "FeatureCollection"});
+        geo_json_14c76010101cfaa2f05cff290711fe6e.setStyle(function(feature) {return feature.properties.style;});
+
+        
+    
+            geo_json_14c76010101cfaa2f05cff290711fe6e.addTo(map_d0b18eb2f07f16954c0d8f5ed8d1e5c0);
+        
+</script>
+</html>
