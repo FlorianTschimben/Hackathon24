@@ -1,22 +1,28 @@
 import io.jenetics.jpx.GPX;
+import io.jenetics.jpx.Route;
 import io.jenetics.jpx.WayPoint;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GPXParser {
-
     private final Path filePath;
 
     public GPXParser(Path filePath) {
         this.filePath = filePath;
     }
 
-    public List<WayPoint> parseWaypoints() throws IOException {
+    public List<List<WayPoint>> parseRoutes() throws IOException {
         GPX gpx = GPX.read(filePath);
-        List<WayPoint> waypoints = gpx.getWayPoints();
+        List<List<WayPoint>> routes = new ArrayList<>();
 
-        return waypoints;
+        for (Route route : gpx.getRoutes()) {
+            List<WayPoint> routeWaypoints = new ArrayList<>(route.getPoints());
+            routes.add(routeWaypoints);
+        }
+
+        return routes;
     }
 }

@@ -8,41 +8,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CustomWaypointRenderer implements WaypointRenderer<CustomWaypoint> {
-    private final List<CustomWaypoint> waypoints = new ArrayList<>();
+    private final List<List<CustomWaypoint>> routes = new ArrayList<>();
 
-    public void setWaypoints(List<CustomWaypoint> waypoints) {
-        this.waypoints.clear();
-        this.waypoints.addAll(waypoints);
+    // Set multiple routes for rendering
+    public void setRoutes(List<List<CustomWaypoint>> routes) {
+        this.routes.clear();
+        this.routes.addAll(routes);
     }
 
     @Override
     public void paintWaypoint(Graphics2D g, JXMapViewer map, CustomWaypoint waypoint) {
-        Icon icon = waypoint.getIcon();
+        // Set line color and thickness for routes
+        g.setStroke(new BasicStroke(4.0f));
 
-        // Convert GeoPosition to screen coordinates
-        Point2D position2D = map.getTileFactory().geoToPixel(waypoint.getPosition(), map.getZoom());
-        Point position = new Point((int) Math.round(position2D.getX()), (int) Math.round(position2D.getY()));
+        // Draw each route with black lines
+        for (List<CustomWaypoint> route : routes) {
+            if (route.size() > 1) {
+                g.setColor(Color.BLACK); // Ensure color is set to black before each route
 
-        // Draw continuous line between waypoints
-        if (waypoints.size() > 1) {
-            g.setColor(Color.BLACK);
-            g.setStroke(new BasicStroke(4.0f));
-
-            for (int i = 1; i < waypoints.size(); i++) {
-                Point2D previousPosition2D = map.getTileFactory().geoToPixel(waypoints.get(i - 1).getPosition(), map.getZoom());
-                Point2D currentPosition2D = map.getTileFactory().geoToPixel(waypoints.get(i).getPosition(), map.getZoom());
-                g.drawLine((int) previousPosition2D.getX(), (int) previousPosition2D.getY(),
-                        (int) currentPosition2D.getX(), (int) currentPosition2D.getY());
+                for (int i = 1; i < route.size(); i++) {
+                    Point2D previousPosition2D = map.getTileFactory().geoToPixel(route.get(i - 1).getPosition(), map.getZoom());
+                    Point2D currentPosition2D = map.getTileFactory().geoToPixel(route.get(i).getPosition(), map.getZoom());
+                    g.drawLine((int) previousPosition2D.getX(), (int) previousPosition2D.getY(),
+                            (int) currentPosition2D.getX(), (int) currentPosition2D.getY());
+                }
             }
-        }
 
-        // Draw the waypoint icon or a default circle if no icon is provided
-        if (icon != null) {
-            icon.paintIcon(map, g, position.x - icon.getIconWidth() / 2, position.y - icon.getIconHeight() / 2);
-        } else {
-            g.setColor(Color.RED);
-            int size = 10;
-            g.fillOval(position.x - size / 2, position.y - size / 2, size, size);
+            // Draw red circles for start and end waypoints only
+            for (CustomWaypoint wp : route) {
+                if (wp.getType() != CustomWaypointType.INTERMEDIATE) {
+                    Point2D position2D = map.getTileFactory().geoToPixel(wp.getPosition(), map.getZoom());
+                    Point position = new Point((int) Math.round(position2D.getX()), (int) Math.round(position2D.getY()));
+
+                    g.setColor(Color.RED); // Set color to red for extremity points
+                    int size = 10;
+                    g.fillOval(position.x - size / 2, position.y - size / 2, size, size);
+                }
+            }
         }
     }
 }
