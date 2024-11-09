@@ -1,4 +1,6 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DatabaseManager
@@ -86,14 +88,9 @@ public class DatabaseManager {
 		return pst.executeQuery();
 	}
 
-
-
 	public static void insert(String query) throws SQLException {
 		c.createStatement().execute(query);
 	}
-
-
-
 
 	public static Transport get(Connection c, String nr) throws SQLException {
 		ResultSet rs = c.createStatement().executeQuery("SELECT * FROM transport WHERE tnr = "+nr);
@@ -112,4 +109,56 @@ public class DatabaseManager {
 			rs.getInt("fnr"),
 			rs.getString("tsektionsoirt"));
 	}
+
+	public static List<Transport> findCarpoolMatches(Connection c, String tnr, int timeWindowMinutes) throws SQLException {
+		List<Transport> matches = new ArrayList<>();
+
+		// Corrected SQL query
+		String query = """
+        SELECT t2.*
+        FROM transport t1
+        JOIN transport t2 ON t1.tbisort = t2.tbisort
+            AND t1.tbisstrasse = t2.tbisstrasse
+        JOIN fahrzeugtypen f ON t2.fnr = f.fnr
+        WHERE t1.tnr = ?
+            AND t1.tnr <> t2.tnr
+            AND ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= ?
+            AND f.fmaximalpassagiere > t2.tkmtotale
+    """;
+
+		PreparedStatement pst = c.prepareStatement(query);
+		pst.setString(1, tnr);
+		pst.setInt(2, timeWindowMinutes);
+
+		ResultSet rs = pst.executeQuery();
+
+		while (rs.next()) {
+			String tnrResult = rs.getString("tnr");
+			String tdatum = rs.getDate("tdatum").toString();
+			String tstart = rs.getTime("tstart").toString();
+			String tende = rs.getTime("tende").toString();
+			String tvonort = rs.getString("tvonort");
+			String tvonstrasse = rs.getString("tvonstrasse");
+			String tbisort = rs.getString("tbisort");
+			String tbisstrasse = rs.getString("tbisstrasse");
+			Transport.TransportArt tart;
+
+			try {
+				tart = Transport.TransportArt.valueOf(rs.getString("tart"));
+			} catch (IllegalArgumentException e) {
+				tart = Transport.TransportArt.KANN_GEHEN; // Default or handle as needed
+				System.out.println("Unknown TransportArt value: " + rs.getString("tart"));
+			}
+
+			String tbezugnr = rs.getString("tbezugnr");
+			int tkmtotale = rs.getInt("tkmtotale");
+			int fnr = rs.getInt("fnr");
+			String tsektionsort = rs.getString("tsektionsoirt");
+
+			matches.add(new Transport(tnrResult, tdatum, tstart, tende, tvonort, tvonstrasse, tbisort, tbisstrasse, tart, tbezugnr, tkmtotale, fnr, tsektionsort));
+		}
+
+		return matches;
+	}
+
 }

@@ -1,5 +1,5 @@
-import java.sql.*;
-import java.util.HashMap;
+import java.sql.Connection;
+import java.util.List;
 
 /**
  * Test
@@ -11,14 +11,8 @@ public class Test {
 		try {
 			Connection c = DatabaseManager.connect("jdbc:mysql://localhost/hackathon", "root", "");
 			//DatabaseManager.initialize(c);
-			ResultSet rs = DatabaseManager.getDuplicateTragetAndTime(c, "1");
-			HashMap<String, Double> duplicateMap= new HashMap<>();
-			while (rs.next()){
-				duplicateMap.put(rs.getInt(5) + ", " + rs.getInt(6),
-						RouteTimeFinder.routeTime(rs.getInt(5) + ", " + rs.getInt(6),
-								rs.getInt(7) + ", " + rs.getInt(8)));
-			}
-			duplicateMap.toString();
+			List<Transport> carpoolMatches = DatabaseManager.findCarpoolMatches(c, "T001", 2000);
+			System.out.println(carpoolMatches.toString());
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
