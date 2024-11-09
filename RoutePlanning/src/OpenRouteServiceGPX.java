@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class OpenRouteServiceGPX {
 
@@ -13,14 +15,14 @@ public class OpenRouteServiceGPX {
         try {
             // Define profile, start, and end coordinates
             String profile = "driving-car";
-                // Example coordinates for the end
+            // Example coordinates for the end
 
             // Replace placeholders in URL with actual values
             String urlString = DIRECTIONS_URL
-                    .replace("{profile}", profile)
-                    .replace("{api_key}", API_KEY)
-                    .replace("{start}", start)
-                    .replace("{end}", end);
+                .replace("{profile}", profile)
+                .replace("{api_key}", API_KEY)
+                .replace("{start}", start)
+                .replace("{end}", end);
 
             URL url = new URL(urlString);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -67,5 +69,83 @@ public class OpenRouteServiceGPX {
         }
 
         return null;
+    }
+
+    public static String getGPXPath(String profile, double[][] waypoints) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(DIRECTIONS_URL + profile + "/");
+        urlBuilder.append("?api_key=").append(API_KEY);
+
+        for (double[] waypoint : waypoints) {
+            urlBuilder.append("&coordinates=").append(waypoint[0]).append(",").append(waypoint[1]);
+        }
+
+        String url = urlBuilder.toString();
+        URL requestUrl = new URL(url);
+
+        HttpURLConnection connection = (HttpURLConnection) requestUrl.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept", "application/json");
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new IOException("Failed to get response from OpenRouteService API. HTTP code: " + responseCode);
+        }
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder responseStringBuilder = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            responseStringBuilder.append(inputLine);
+        }
+        in.close();
+
+        JSONObject jsonResponse = new JSONObject(responseStringBuilder.toString());
+        if (jsonResponse.has("routes")) {
+            JSONArray routes = jsonResponse.getJSONArray("routes");
+            if (routes.length() > 0) {
+                JSONObject firstRoute = routes.getJSONObject(0);
+                if (firstRoute.has("gpx")) {
+                    return firstRoute.getString("gpx");
+                }
+            }
+        }
+
+        return "GPX data not found";
+    }
+
+    public static String generateIntermediateGPXPointsAsGPX(double[] startPoint, double[] endPoint, int numberOfPoints) {
+        StringBuilder gpxBuilder = new StringBuilder();
+
+        gpxBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        gpxBuilder.append("<gpx version=\"1.1\" creator=\"OpenRouteServiceGPX\">\n");
+        gpxBuilder.append("  <trk>\n");
+        gpxBuilder.append("    <name>Intermediate Points</name>\n");
+        gpxBuilder.append("    <trkseg>\n");
+
+        double latIncrement = (endPoint[0] - startPoint[0]) / (numberOfPoints - 1);
+        double lonIncrement = (endPoint[1] - startPoint[1]) / (numberOfPoints - 1);
+
+        for (int i = 0; i < numberOfPoints; i++) {
+            double latitude = startPoint[0] + (i * latIncrement);
+            double longitude = startPoint[1] + (i * lonIncrement);
+
+            gpxBuilder.append("      <trkpt lat=\"").append(latitude).append("\" lon=\"").append(longitude).append("\">\n");
+            gpxBuilder.append("      </trkpt>\n");
+        }
+
+        gpxBuilder.append("    </trkseg>\n");
+        gpxBuilder.append("  </trk>\n");
+        gpxBuilder.append("</gpx>");
+
+        return gpxBuilder.toString();
+    }
+
+    public static void main(String[] args) {
+        double[] startPoint = {52.5200, 13.4050}; // Berlin
+        double[] endPoint = {48.8566, 2.3522}; // Paris
+
+        String gpxData = generateIntermediateGPXPointsAsGPX(startPoint, endPoint, 100);
+
+        System.out.println(gpxData);
     }
 }

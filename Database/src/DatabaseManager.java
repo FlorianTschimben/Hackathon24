@@ -44,22 +44,6 @@ public class DatabaseManager {
 			    	ON UPDATE CASCADE ON DELETE RESTRICT
 			)""";
 		transport.execute(transportCreate);
-
-		Statement strecken = c.createStatement();
-		String streckenCreate = """
-			CREATE TABLE strecken(
-				snr INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-			    tnr VARCHAR(20) NOT NULL,
-			    svonort VARCHAR(100) NOT NULL,
-			    sbisort VARCHAR(100) NOT NULL,
-			    sstuhl INT NOT NULL,
-			    sgehend INT NOT NULL,
-			    ssitz INT NOT NULL,
-			    sliege BOOLEAN NOT NULL,
-			    FOREIGN KEY (tnr) REFERENCES transport(tnr)
-			    ON UPDATE CASCADE ON DELETE CASCADE
-			)""";
-		strecken.execute(streckenCreate);
 	}
 
 	public static Connection connect(String url, String username, String password) throws SQLException {
@@ -107,16 +91,12 @@ public class DatabaseManager {
 			rs.getString("tbezugnr"),
 			rs.getInt("tkmtotale"),
 			rs.getInt("fnr"),
-			rs.getString("tsektionsort"));
+			rs.getString("tsektionsoirt"));
 	}
 
 	public static List<Transport> findCarpoolMatches(Connection c, String tnr, int timeWindowMinutes) throws SQLException {
 		List<Transport> matches = new ArrayList<>();
 
-		// Debug-Anzeige
-		System.out.println("findCarpoolMatches aufgerufen mit tnr=" + tnr + ", timeWindowMinutes=" + timeWindowMinutes);
-
-		// Angepasste SQL-Abfrage mit Datum
 		String query = """
         SELECT t2.*
         FROM transport t1
@@ -133,11 +113,8 @@ public class DatabaseManager {
 		pst.setString(1, tnr);
 		pst.setInt(2, timeWindowMinutes);
 
-		System.out.println(pst.toString());
-
 		ResultSet rs = pst.executeQuery();
 
-		// Schleife durch die ResultSet-Ergebnisse
 		while (rs.next()) {
 			String tnrResult = rs.getString("tnr");
 			String tdatum = rs.getDate("tdatum").toString();
@@ -149,6 +126,7 @@ public class DatabaseManager {
 			String tbisstrasse = rs.getString("tbisstrasse");
 
 			Transport.TransportArt tart;
+
 			try {
 				tart = Transport.TransportArt.valueOf(rs.getString("tart"));
 			} catch (IllegalArgumentException e) {
@@ -159,17 +137,16 @@ public class DatabaseManager {
 			String tbezugnr = rs.getString("tbezugnr");
 			int tkmtotale = rs.getInt("tkmtotale");
 			int fnr = rs.getInt("fnr");
-			String tsektionsort = rs.getString("tsektionsort");
+			String tsektionsort = rs.getString("tsektionsoirt");
 
-			// Debug-Ausgabe der gefundenen Übereinstimmungen
-			System.out.println("Match gefunden: tnr=" + tnrResult);
-
-			// Transport-Objekt hinzufügen
 			matches.add(new Transport(tnrResult, tdatum, tstart, tende, tvonort, tvonstrasse, tbisort, tbisstrasse, tart, tbezugnr, tkmtotale, fnr, tsektionsort));
 		}
 
 		return matches;
 	}
 
+	public static void execute(Connection c, String query) throws SQLException {
+		c.createStatement().execute(query);
+	}
 
 }
