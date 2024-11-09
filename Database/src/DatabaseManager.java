@@ -84,16 +84,9 @@ public class DatabaseManager {
 		PreparedStatement pst = c.prepareStatement(query);
 		pst.setString(1, tnr); // Setze den Parameter tnr in die Abfrage ein
 		return pst.executeQuery();
-			SELECT t1.tnr
-				FROM transport t1, transport t2
-				WHERE t1.tbisort = t2.tbisort
-				AND t1.tbisstrasse = t2.tbisstrasse
-				AND t1.tnr <> t2.tnr
-				AND	ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= 15
-				AND t1.tdatum = t2.tdatum
-			""";
-		return c.createStatement().executeQuery(query);
 	}
+
+
 
 	public static void insert(String query) throws SQLException {
 		c.createStatement().execute(query);

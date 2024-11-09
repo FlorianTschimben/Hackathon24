@@ -18,8 +18,11 @@ public class Test {
 			ResultSet rs = DatabaseManager.getDuplicateTragetAndTime(c, "1");
 			HashMap<String, Double> duplicateMap= new HashMap<>();
 			while (rs.next()){
-				duplicateMap.put(rs.)
+				duplicateMap.put(rs.getInt(5) + ", " + rs.getInt(6),
+						RouteTimeFinder.routeTime(rs.getInt(5) + ", " + rs.getInt(6),
+								rs.getInt(7) + ", " + rs.getInt(8)));
 			}
+			duplicateMap.toString();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
