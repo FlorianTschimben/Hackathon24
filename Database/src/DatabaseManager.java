@@ -1,3 +1,4 @@
+import java.net.ConnectException;
 import java.sql.*;
 
 /**
@@ -37,7 +38,7 @@ public class DatabaseManager {
 				    tbezugnr VARCHAR(20),
 				    tkmtotale INT NOT NULL,
 				    fnr INT NOT NULL,
-				    tsektionsort VARCHAR(100),
+				    tsektionsoirt VARCHAR(100),
 				    FOREIGN KEY (fnr) REFERENCES fahrzeugtypen(fnr)
 			    	ON UPDATE CASCADE ON DELETE RESTRICT
 			)""";
@@ -77,12 +78,31 @@ public class DatabaseManager {
 				WHERE t1.tbisort = t2.tbisort
 				AND t1.tbisstrasse = t2.tbisstrasse
 				AND t1.tnr <> t2.tnr
-				AND	ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= 15;
+				AND	ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= 15
+				AND t1.tdatum = t2.tdatum
 			""";
 		return c.createStatement().executeQuery(query);
 	}
 
 	public static void insert(String query) throws SQLException {
 		c.createStatement().execute(query);
+	}
+
+	public static Transport get(Connection c, String nr) throws SQLException {
+		ResultSet rs = c.createStatement().executeQuery("SELECT * FROM transport WHERE tnr = "+nr);
+		rs.next();
+		return new Transport( rs.getString("tnr"),
+			rs.getDate("tdatum").toString(),
+			rs.getTime("tstart").toString(),
+			rs.getTime("tende").toString(),
+			rs.getString("tvonort"),
+			rs.getString("tvonstrasse"),
+			rs.getString("tbisort"),
+			rs.getString("tbisstrasse"),
+			Transport.TransportArt.valueOf(rs.getString("tart")),
+			rs.getString("tbezugnr"),
+			rs.getInt("tkmtotale"),
+			rs.getInt("fnr"),
+			rs.getString("tsektionsoirt"));
 	}
 }
