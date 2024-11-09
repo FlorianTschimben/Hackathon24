@@ -7,12 +7,12 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 
 
-public class Main {
-    public static void main(String[] args) {
+public class RouteTimeFinder {
+    public static double routeTime(String start, String destination) {
         HttpClient orsClient = HttpClient.newHttpClient();
         try {
-            String geoCode1 = OpenRouteServiceGeocoding.geocodeAddress("Neulandstraße 7, Neumarkt,BZ,Italien");
-            String geoCode2 = OpenRouteServiceGeocoding.geocodeAddress("Sorrentstraße 20, Bozen,BZ,Italien");
+            String geoCode1 = OpenRouteServiceGeocoding.geocodeAddress(start);
+            String geoCode2 = OpenRouteServiceGeocoding.geocodeAddress(destination);
 
         try {
             DirectionsServicePOSTResult output = new DirectionsServicePOSTRequest(
@@ -38,9 +38,9 @@ public class Main {
             JSONArray routes = jsonResponseObj.getJSONArray("routes");
             JSONObject firstRoute = routes.getJSONObject(0);
             JSONObject summary = firstRoute.getJSONObject("summary");
-            double overallDuration = summary.getDouble("duration");
+            return summary.getDouble("duration");
 
-            System.out.println("Overall Duration: " + overallDuration + " seconds");
+
 
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -52,7 +52,5 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println("Hello world!");
     }
 }

@@ -1,3 +1,5 @@
+import com.formdev.flatlaf.FlatLightLaf;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
@@ -13,6 +15,12 @@ public class DispatcherUI extends JFrame {
     private CardLayout cardLayout;
 
     public DispatcherUI() {
+        try {
+            UIManager.setLookAndFeel( new FlatLightLaf() );
+        } catch( Exception ex ) {
+            System.err.println( "Failed to initialize LaF" );
+        }
+
         setTitle("Dispatcher UI");
         setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

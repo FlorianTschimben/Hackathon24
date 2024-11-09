@@ -25,7 +25,7 @@ public class DatabaseManager {
 		Statement transport = c.createStatement();
 		String transportCreate = """
 			CREATE TABLE transport(
-					tnr VARCHAR(10) PRIMARY KEY,
+					tnr VARCHAR(20) PRIMARY KEY,
 				    tdatum DATE NOT NULL,
 				    tstart TIME NOT NULL,
 				    tende TIME NOT NULL,
@@ -34,14 +34,30 @@ public class DatabaseManager {
 				    tbisort VARCHAR(100) NOT NULL,
 				    tbisstrasse VARCHAR(100) NOT NULL,
 				    tart ENUM("KANN GEHEN", "STUHL", "LIEGE", "KEIN PATIENT", "EIGENER ROLLSTUHL") NOT NULL,
-				    tbezugnr VARCHAR(10),
+				    tbezugnr VARCHAR(20),
 				    tkmtotale INT NOT NULL,
 				    fnr INT NOT NULL,
-				    tsektionsoirt VARCHAR(100),
+				    tsektionsort VARCHAR(100),
 				    FOREIGN KEY (fnr) REFERENCES fahrzeugtypen(fnr)
 			    	ON UPDATE CASCADE ON DELETE RESTRICT
 			)""";
 		transport.execute(transportCreate);
+
+		Statement strecken = c.createStatement();
+		String streckenCreate = """
+			CREATE TABLE strecken(
+				snr INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+			    tnr VARCHAR(20) NOT NULL,
+			    svonort VARCHAR(100) NOT NULL,
+			    sbisort VARCHAR(100) NOT NULL,
+			    sstuhl INT NOT NULL,
+			    sgehend INT NOT NULL,
+			    ssitz INT NOT NULL,
+			    sliege BOOLEAN NOT NULL,
+			    FOREIGN KEY (tnr) REFERENCES transport(tnr)
+			    ON UPDATE CASCADE ON DELETE CASCADE
+			)""";
+		strecken.execute(streckenCreate);
 	}
 
 	public static Connection connect(String url, String username, String password) throws SQLException {
@@ -52,5 +68,21 @@ public class DatabaseManager {
 
 	public static ResultSet getEveryTransport(Connection c) throws SQLException {
 		return c.createStatement().executeQuery("SELECT * FROM transport");
+	}
+
+	public static ResultSet getDuplicateTragetAndTime(Connection c) throws SQLException {
+		String query = """
+			SELECT t1.tnr
+				FROM transport t1, transport t2
+				WHERE t1.tbisort = t2.tbisort
+				AND t1.tbisstrasse = t2.tbisstrasse
+				AND t1.tnr <> t2.tnr
+				AND	ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= 15;
+			""";
+		return c.createStatement().executeQuery(query);
+	}
+
+	public static void insert(String query) throws SQLException {
+		c.createStatement().execute(query);
 	}
 }
