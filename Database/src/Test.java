@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.HashMap;
 
 /**
  * Test
@@ -14,6 +15,11 @@ public class Test {
 				"Andreas-Hofer-Straße 7", "Meran", "Meranrgasse 8", Transport.TransportArt.STUHL ,null, 30,
 				2, "Meran");
 			DatabaseManager.insert(t.generateInsertQuery());
+			ResultSet rs = DatabaseManager.getDuplicateTragetAndTime(c, "1");
+			HashMap<String, Double> duplicateMap= new HashMap<>();
+			while (rs.next()){
+				duplicateMap.put(rs.)
+			}
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
