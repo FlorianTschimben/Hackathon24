@@ -85,7 +85,7 @@ public class DispatcherUI extends JFrame {
         ArrayList<Object[]> rows = new ArrayList<>();
 
 		try {
-            ResultSet rs = DatabaseManager.getEveryTransport(DatabaseManager.connect("jdbc:mysql://localhost/hackathon", "root", ""));
+            ResultSet rs = DatabaseManager.getEveryTransport(DatabaseManager.connect("jdbc:mysql://10.199.228.183/hackathon", "root", ""));
 
 		while (rs.next()) {
                 Object[] row = {
