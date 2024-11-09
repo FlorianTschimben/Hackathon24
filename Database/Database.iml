@@ -17,6 +17,7 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="RoutePlanning" />
+<<<<<<< HEAD
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -26,5 +27,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+=======
+>>>>>>> 28b3cb438b0807abd90d9092e3661fb7420cf438
   </component>
 </module>

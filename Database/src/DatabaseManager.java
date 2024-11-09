@@ -1,4 +1,3 @@
-import java.net.ConnectException;
 import java.sql.*;
 
 /**
@@ -38,7 +37,7 @@ public class DatabaseManager {
 				    tbezugnr VARCHAR(20),
 				    tkmtotale INT NOT NULL,
 				    fnr INT NOT NULL,
-				    tsektionsoirt VARCHAR(100),
+				    tsektionsort VARCHAR(100),
 				    FOREIGN KEY (fnr) REFERENCES fahrzeugtypen(fnr)
 			    	ON UPDATE CASCADE ON DELETE RESTRICT
 			)""";
@@ -71,22 +70,30 @@ public class DatabaseManager {
 		return c.createStatement().executeQuery("SELECT * FROM transport");
 	}
 
-	public static ResultSet getDuplicateTragetAndTime(Connection c) throws SQLException {
+	public static ResultSet getDuplicateTragetAndTime(Connection c, String tnr) throws SQLException {
 		String query = """
-			SELECT t1.tnr
-				FROM transport t1, transport t2
-				WHERE t1.tbisort = t2.tbisort
-				AND t1.tbisstrasse = t2.tbisstrasse
-				AND t1.tnr <> t2.tnr
-				AND	ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= 15
-				AND t1.tdatum = t2.tdatum
-			""";
-		return c.createStatement().executeQuery(query);
+        SELECT t1.tnr
+        FROM transport t1, transport t2
+        WHERE t1.tbisort = t2.tbisort
+        AND t1.tbisstrasse = t2.tbisstrasse
+        AND t1.tnr = ?
+        AND t1.tnr <> t2.tnr
+        AND ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= 15;
+        """;
+
+		PreparedStatement pst = c.prepareStatement(query);
+		pst.setString(1, tnr); // Setze den Parameter tnr in die Abfrage ein
+		return pst.executeQuery();
 	}
+
+
 
 	public static void insert(String query) throws SQLException {
 		c.createStatement().execute(query);
 	}
+
+
+
 
 	public static Transport get(Connection c, String nr) throws SQLException {
 		ResultSet rs = c.createStatement().executeQuery("SELECT * FROM transport WHERE tnr = "+nr);
