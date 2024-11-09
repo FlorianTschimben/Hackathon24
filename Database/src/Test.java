@@ -11,7 +11,7 @@ public class Test {
 		try {
 			Connection c = DatabaseManager.connect("jdbc:mysql://localhost/hackathon", "root", "");
 			//DatabaseManager.initialize(c);
-			List<Transport> carpoolMatches = DatabaseManager.findCarpoolMatches(c, "T001", 2000);
+			List<Transport> carpoolMatches = DatabaseManager.findCarpoolMatches(c, "T102", 2000);
 			System.out.println(carpoolMatches.toString());
 		}
 		catch (Exception e) {

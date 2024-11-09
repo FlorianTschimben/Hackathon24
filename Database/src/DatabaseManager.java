@@ -44,22 +44,6 @@ public class DatabaseManager {
 			    	ON UPDATE CASCADE ON DELETE RESTRICT
 			)""";
 		transport.execute(transportCreate);
-
-		Statement strecken = c.createStatement();
-		String streckenCreate = """
-			CREATE TABLE strecken(
-				snr INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-			    tnr VARCHAR(20) NOT NULL,
-			    svonort VARCHAR(100) NOT NULL,
-			    sbisort VARCHAR(100) NOT NULL,
-			    sstuhl INT NOT NULL,
-			    sgehend INT NOT NULL,
-			    ssitz INT NOT NULL,
-			    sliege BOOLEAN NOT NULL,
-			    FOREIGN KEY (tnr) REFERENCES transport(tnr)
-			    ON UPDATE CASCADE ON DELETE CASCADE
-			)""";
-		strecken.execute(streckenCreate);
 	}
 
 	public static Connection connect(String url, String username, String password) throws SQLException {
@@ -113,7 +97,6 @@ public class DatabaseManager {
 	public static List<Transport> findCarpoolMatches(Connection c, String tnr, int timeWindowMinutes) throws SQLException {
 		List<Transport> matches = new ArrayList<>();
 
-		// Corrected SQL query
 		String query = """
         SELECT t2.*
         FROM transport t1
@@ -159,6 +142,10 @@ public class DatabaseManager {
 		}
 
 		return matches;
+	}
+
+	public static void execute(Connection c, String query) throws SQLException {
+		c.createStatement().execute(query);
 	}
 
 }
