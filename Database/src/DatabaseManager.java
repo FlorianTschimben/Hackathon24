@@ -102,11 +102,11 @@ public class DatabaseManager {
         FROM transport t1
         JOIN transport t2 ON t1.tbisort = t2.tbisort
             AND t1.tbisstrasse = t2.tbisstrasse
+            AND t1.tdatum = t2.tdatum
         JOIN fahrzeugtypen f ON t2.fnr = f.fnr
         WHERE t1.tnr = ?
             AND t1.tnr <> t2.tnr
             AND ABS(TIME_TO_SEC(TIMEDIFF(t1.tende, t2.tende)) / 60) <= ?
-            AND f.fmaximalpassagiere > t2.tkmtotale
     """;
 
 		PreparedStatement pst = c.prepareStatement(query);
@@ -124,13 +124,14 @@ public class DatabaseManager {
 			String tvonstrasse = rs.getString("tvonstrasse");
 			String tbisort = rs.getString("tbisort");
 			String tbisstrasse = rs.getString("tbisstrasse");
+
 			Transport.TransportArt tart;
 
 			try {
 				tart = Transport.TransportArt.valueOf(rs.getString("tart"));
 			} catch (IllegalArgumentException e) {
-				tart = Transport.TransportArt.KANN_GEHEN; // Default or handle as needed
-				System.out.println("Unknown TransportArt value: " + rs.getString("tart"));
+				tart = Transport.TransportArt.KANN_GEHEN; // Standardwert bei Fehler
+				System.out.println("Unbekannter TransportArt-Wert: " + rs.getString("tart"));
 			}
 
 			String tbezugnr = rs.getString("tbezugnr");
