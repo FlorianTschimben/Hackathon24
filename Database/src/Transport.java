@@ -41,4 +41,56 @@ public class Transport {
 			+ tend + "', '" + tvonort + "', '" + tvonstrasse + "', '" + tbisort + "', '" + tbisstrasse
 			+ "', '" + art + "', " + (tbezugnr == null ? "NULL" : "'"+tbezugnr+"'") + ", " + tkmtotale + ", " + fnr + ", '" + tsektionsort + "')";
 	}
+
+	public String getTnr() {
+		return tnr;
+	}
+
+	public String getTdatum() {
+		return tdatum;
+	}
+
+	public String getTstart() {
+		return tstart;
+	}
+
+	public String getTend() {
+		return tend;
+	}
+
+	public String getTvonort() {
+		return tvonort;
+	}
+
+	public String getTvonstrasse() {
+		return tvonstrasse;
+	}
+
+	public String getTbisort() {
+		return tbisort;
+	}
+
+	public String getTbisstrasse() {
+		return tbisstrasse;
+	}
+
+	public TransportArt getArt() {
+		return art;
+	}
+
+	public String getTbezugnr() {
+		return tbezugnr;
+	}
+
+	public int getTkmtotale() {
+		return tkmtotale;
+	}
+
+	public int getFnr() {
+		return fnr;
+	}
+
+	public String getTsektionsort() {
+		return tsektionsort;
+	}
 }
