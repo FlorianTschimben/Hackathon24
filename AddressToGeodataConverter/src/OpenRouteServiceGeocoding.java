@@ -15,7 +15,7 @@ public class OpenRouteServiceGeocoding {
     private static final String GEOCODING_URL = "https://api.openrouteservice.org/geocode/search";
 
     public static void main(String[] args) {
-        String address = "Via Cristoforo Colombo, Roma RM";
+        String address = "Sorrentostraße 20, Bozen BZ";
         try {
             String coordinates = geocodeAddress(address);
             if (coordinates != null) {

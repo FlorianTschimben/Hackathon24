@@ -35,7 +35,7 @@ public class DatabaseManager {
 				    tvonstrasse VARCHAR(100) NOT NULL,
 				    tbisort VARCHAR(100) NOT NULL,
 				    tbisstrasse VARCHAR(100) NOT NULL,
-				    tart ENUM("KANN GEHEN", "STUHL", "LIEGE", "KEIN PATIENT", "EIGENER ROLLSTUHL") NOT NULL,
+				    tart ENUM("KANN_GEHEN", "STUHL", "LIEGE", "KEIN_PATIENT", "EIGENER_ROLLSTUHL") NOT NULL,
 				    tbezugnr VARCHAR(20),
 				    tkmtotale INT NOT NULL,
 				    fnr INT NOT NULL,

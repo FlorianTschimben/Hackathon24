@@ -2,46 +2,31 @@ import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
+import io.jenetics.jpx.GPX;
 import io.jenetics.jpx.WayPoint;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class GPXMapViewer {
-    private static final String GPX_FILE_PATH = "UI/gpxgenerator_path.gpx"; // Update to your actual file path
+public class GPXMapViewer extends JPanel {
+    private String gpxFilePath;
+    private JXMapViewer mapViewer;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                JXMapViewer mapViewer = initializeMap();
-                List<List<GeoPosition>> routePositions = loadRoutes();
-
-                // Set initial location to the first waypoint of the first route if available
-                if (!routePositions.isEmpty() && !routePositions.get(0).isEmpty()) {
-                    mapViewer.setAddressLocation(routePositions.get(0).get(0)); // Center on first waypoint
-                    mapViewer.setZoom(5); // Set initial zoom level as desired
-                }
-
-                GPXWaypointViewer waypointViewer = new GPXWaypointViewer(mapViewer);
-                waypointViewer.plotRoutes(routePositions);
-
-                JFrame frame = new JFrame("GPX Waypoint Viewer - Multiple Routes");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.getContentPane().add(mapViewer);
-                frame.setSize(800, 600);
-                frame.setVisible(true);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+    public GPXMapViewer(String gpxFilePath) {
+        this.gpxFilePath = gpxFilePath;
+        setLayout(new BorderLayout());
+        initializeMapViewer();
+        loadRoutesFromGPX();
+        add(mapViewer, BorderLayout.CENTER);
     }
 
-    private static JXMapViewer initializeMap() {
-        JXMapViewer mapViewer = new JXMapViewer();
+    private void initializeMapViewer() {
+        mapViewer = new JXMapViewer();
 
         TileFactoryInfo info = new TileFactoryInfo(1, 17, 17, 256, true, true,
                 "https://tile.openstreetmap.org", "{z}", "{x}", "{y}.png") {
@@ -53,24 +38,34 @@ public class GPXMapViewer {
         };
 
         mapViewer.setTileFactory(new DefaultTileFactory(info));
-        return mapViewer;
     }
 
-    private static List<List<GeoPosition>> loadRoutes() throws Exception {
-        GPXParser parser = new GPXParser(Paths.get(GPX_FILE_PATH));
-        List<List<WayPoint>> routes = parser.parseRoutes();
-
-        List<List<GeoPosition>> routePositions = new ArrayList<>();
-        for (List<WayPoint> waypoints : routes) {
+    private void loadRoutesFromGPX() {
+        try {
+            GPX gpx = GPX.read(Paths.get(gpxFilePath));
             List<GeoPosition> positions = new ArrayList<>();
-            for (WayPoint waypoint : waypoints) {
-                positions.add(new GeoPosition(
-                        waypoint.getLatitude().doubleValue(),
-                        waypoint.getLongitude().doubleValue()
-                ));
+
+            // Extract waypoints from GPX and add to map
+            gpx.tracks().forEach(track ->
+                    track.segments().forEach(segment ->
+                            segment.points().forEach(point ->
+                                    positions.add(new GeoPosition(point.getLatitude().doubleValue(), point.getLongitude().doubleValue()))
+                            )
+                    )
+            );
+
+            if (!positions.isEmpty()) {
+                mapViewer.setAddressLocation(positions.get(0)); // Center on the first point
+                mapViewer.setZoom(5); // Adjust zoom as needed
             }
-            routePositions.add(positions);
+
+            GPXWaypointViewer waypointViewer = new GPXWaypointViewer(mapViewer);
+            waypointViewer.plotRoutes(Collections.singletonList(positions));
+
+            System.out.println("Routes loaded from GPX file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to load GPX file: " + gpxFilePath);
         }
-        return routePositions;
     }
 }

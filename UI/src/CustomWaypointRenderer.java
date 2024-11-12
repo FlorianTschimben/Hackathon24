@@ -36,14 +36,14 @@ public class CustomWaypointRenderer implements WaypointRenderer<CustomWaypoint> 
 
             // Draw red circles for start and end waypoints only
             for (CustomWaypoint wp : route) {
-                if (wp.getType() != CustomWaypointType.INTERMEDIATE) {
+
                     Point2D position2D = map.getTileFactory().geoToPixel(wp.getPosition(), map.getZoom());
                     Point position = new Point((int) Math.round(position2D.getX()), (int) Math.round(position2D.getY()));
 
                     g.setColor(Color.RED); // Set color to red for extremity points
                     int size = 10;
                     g.fillOval(position.x - size / 2, position.y - size / 2, size, size);
-                }
+
             }
         }
     }

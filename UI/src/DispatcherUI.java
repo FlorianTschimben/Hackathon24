@@ -1,8 +1,10 @@
 import com.formdev.flatlaf.FlatLightLaf;
-
 import javax.swing.*;
 import java.awt.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class DispatcherUI extends JFrame {
@@ -10,15 +12,14 @@ public class DispatcherUI extends JFrame {
     private JPanel mainPanel;
     private JPanel dashboardPanel;
     private JPanel mapPanel;
-    private JPanel patientManagementPanel;
-    private JPanel historyPanel;
     private CardLayout cardLayout;
+    private static final String GPX_FILE_PATH = "UI/gpxgenerator_path.gpx"; // Path to the GPX file
 
     public DispatcherUI() {
         try {
-            UIManager.setLookAndFeel( new FlatLightLaf() );
-        } catch( Exception ex ) {
-            System.err.println( "Failed to initialize LaF" );
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize LaF");
         }
 
         setTitle("Dispatcher UI");
@@ -30,34 +31,37 @@ public class DispatcherUI extends JFrame {
         mainPanel = new JPanel(cardLayout);
 
         dashboardPanel = new JPanel(new BorderLayout());
-        mapPanel = new JPanel();
-        patientManagementPanel = new JPanel(new BorderLayout());
-        historyPanel = new JPanel(new BorderLayout());
+        mapPanel = new JPanel(new BorderLayout());
 
         mainPanel.add(dashboardPanel, "Dashboard");
         mainPanel.add(mapPanel, "Map");
-        mainPanel.add(patientManagementPanel, "PatientManagement");
-        mainPanel.add(historyPanel, "History");
 
-        JPanel sideMenu = new JPanel(new GridLayout(4, 1, 5, 5));
+        JPanel sideMenu = new JPanel(new GridLayout(2, 1, 5, 5));
         JButton dashboardButton = new JButton("Dashboard");
         JButton mapButton = new JButton("Map View");
-        JButton patientManagementButton = new JButton("Patient Management");
-        JButton historyButton = new JButton("History");
 
         sideMenu.add(dashboardButton);
         sideMenu.add(mapButton);
-        sideMenu.add(patientManagementButton);
-        sideMenu.add(historyButton);
 
         dashboardButton.addActionListener(e -> cardLayout.show(mainPanel, "Dashboard"));
-        mapButton.addActionListener(e -> cardLayout.show(mainPanel, "Map"));
-        patientManagementButton.addActionListener(e -> cardLayout.show(mainPanel, "PatientManagement"));
-        historyButton.addActionListener(e -> cardLayout.show(mainPanel, "History"));
+
+        // Modified action listener for "Map View" button
+        mapButton.addActionListener(e -> {
+            try {
+                // Connect to the database and generate the GPX file with routes
+                Connection connection = DatabaseManager.connect("jdbc:mysql://localhost/hackathon", "root", "masterkey");
+                GPXRouteGenerator.generateGPXRoutes(connection);
+            } catch (SQLException | IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to load routes: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            // Display the GPXMapViewer in the mapPanel
+            displayMap();
+            cardLayout.show(mainPanel, "Map");
+        });
 
         setupDashboardPanel();
-        setupPatientManagementPanel();
-        setupHistoryPanel();
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(sideMenu, BorderLayout.WEST);
@@ -66,7 +70,7 @@ public class DispatcherUI extends JFrame {
 
     private void setupDashboardPanel() {
         String[] columnNames = {"Transport ID", "Date", "Start Time", "End Time", "From City", "From Street", "To City", "To Street", "Type", "Reference", "Total KM", "Vehicle ID", "Section"};
-        Object[][] data = fetchTransportData(); // Get data from the database
+        Object[][] data = fetchTransportData();
         JTable transportTable = new JTable(data, columnNames);
 
         dashboardPanel.add(new JScrollPane(transportTable), BorderLayout.CENTER);
@@ -84,64 +88,38 @@ public class DispatcherUI extends JFrame {
     private Object[][] fetchTransportData() {
         ArrayList<Object[]> rows = new ArrayList<>();
 
-		try {
-            ResultSet rs = DatabaseManager.getEveryTransport(DatabaseManager.connect("jdbc:mysql://localhost/hackathon", "root", ""));
+        try {
+            ResultSet rs = DatabaseManager.getEveryTransport(DatabaseManager.connect("jdbc:mysql://localhost/hackathon", "root", "masterkey"));
 
-		while (rs.next()) {
+            while (rs.next()) {
                 Object[] row = {
-                    rs.getString("tnr"),
-                    rs.getDate("tdatum"),
-                    rs.getTime("tstart"),
-                    rs.getTime("tende"),
-                    rs.getString("tvonort"),
-                    rs.getString("tvonstrasse"),
-                    rs.getString("tbisort"),
-                    rs.getString("tbisstrasse"),
-                    rs.getString("tart"),
-                    rs.getString("tbezugnr"),
-                    rs.getInt("tkmtotale"),
-                    rs.getInt("fnr"),
-                    rs.getString("tsektionsoirt")
+                        rs.getString("tnr"),
+                        rs.getDate("tdatum"),
+                        rs.getTime("tstart"),
+                        rs.getTime("tende"),
+                        rs.getString("tvonort"),
+                        rs.getString("tvonstrasse"),
+                        rs.getString("tbisort"),
+                        rs.getString("tbisstrasse"),
+                        rs.getString("tart"),
+                        rs.getString("tbezugnr"),
+                        rs.getInt("tkmtotale"),
+                        rs.getInt("fnr"),
+                        rs.getString("tsektionsort")
                 };
                 rows.add(row);
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return rows.toArray(new Object[0][0]);
     }
 
-    private void setupPatientManagementPanel() {
-        String[] columnNames = {"Patient ID", "Name", "Destination", "Arrival Time"};
-        Object[][] data = {};
-        JTable patientTable = new JTable(data, columnNames);
-
-        patientManagementPanel.add(new JScrollPane(patientTable), BorderLayout.CENTER);
-
-        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton addPatientButton = new JButton("Add Patient");
-        JButton editPatientButton = new JButton("Edit Patient");
-
-        topBar.add(addPatientButton);
-        topBar.add(editPatientButton);
-
-        patientManagementPanel.add(topBar, BorderLayout.NORTH);
-    }
-
-    private void setupHistoryPanel() {
-        String[] columnNames = {"Transport ID", "Vehicle", "Patients", "Departure", "Arrival"};
-        Object[][] data = {};
-        JTable historyTable = new JTable(data, columnNames);
-
-        historyPanel.add(new JScrollPane(historyTable), BorderLayout.CENTER);
-
-        JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton generateReportButton = new JButton("Generate Report");
-
-        topBar.add(generateReportButton);
-
-        historyPanel.add(topBar, BorderLayout.NORTH);
+    private void displayMap() {
+        mapPanel.removeAll();
+        mapPanel.add(new GPXMapViewer(GPX_FILE_PATH), BorderLayout.CENTER);
+        mapPanel.revalidate();
+        mapPanel.repaint();
     }
 
     public static void main(String[] args) {
